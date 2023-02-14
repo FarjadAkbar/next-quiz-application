@@ -1,12 +1,8 @@
 import type { NextPage } from "next";
-import HomeScreen from "screens/HomeScreen";
-// import Button from "theme/Button";
+import QuizScreen from "screens/QuizScreen/index";
 
-// import Head from "next/head";
-// import Image from "next/image";
-
-const Home: NextPage = () => {
-  return <HomeScreen />;
+const Quiz: NextPage = () => {
+  return <QuizScreen />;
 };
 
-export default Home;
+export default Quiz;
