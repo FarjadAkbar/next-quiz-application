@@ -32,7 +32,7 @@ const AuthContextProvider: React.FC<AuthContextProps> = ({ children }) => {
   }, [router]);
 
   const prevToken = getAuthenticationToken();
-  const currToken: any = session?.accessToken;
+  const currToken: any = session;
 
   if (currToken && prevToken !== `Bearer ${currToken}`) {
     setAuthenticationHeader(currToken);

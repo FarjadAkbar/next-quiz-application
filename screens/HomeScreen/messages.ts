@@ -9,13 +9,34 @@ import { defineMessages } from "react-intl";
 export const scope = "app.screens.HomeScreen";
 
 export default defineMessages({
-  title: {
-    id: `${scope}.title`,
-    defaultMessage: "Home Screen",
+  welcome: {
+    id: `${scope}.welcome`,
+    defaultMessage: "Welcome To Quiz App",
   },
-  description: {
-    id: `${scope}.description`,
-    defaultMessage: "This is the basic starter project for react",
+  name: {
+    id: `${scope}.name`,
+    defaultMessage: "Name",
   },
+  namePlaceholder: {
+    id: `${scope}.namePlaceholder`,
+    defaultMessage: "Enter Name"
+  },
+  email: {
+    id: `${scope}.email`,
+    defaultMessage: "Email",
+  },
+  emailPlaceholder: {
+    id: `${scope}.emailPlaceholder`,
+    defaultMessage: "Enter Email"
+  },
+
+
+
+  
+  quizAppTitle: {
+    id: `${scope}.quizAppTitle`,
+    defaultMessage: "Quiz App",
+  },
+ 
  
 });
