@@ -87,7 +87,7 @@ class MyApp extends App<{
   render() {
     const {
       Component,
-      pageProps: { session, ...pageProps },
+      pageProps: { ...pageProps },
       locale,
       messages,
     } = this.props;
@@ -101,7 +101,7 @@ class MyApp extends App<{
         <ThemeContextProvider>
           <ThemeProvider>
             <IntlProvider locale={locale || "en"} messages={messages}>
-              <SessionProvider session={session}>
+              <SessionProvider>
                 {/* <AuthContextProvider> */}
                 <QueryClientProvider client={queryClient}>
                   <SnackbarProvider
@@ -110,7 +110,7 @@ class MyApp extends App<{
                       horizontal: "right",
                     }}
                   >
-                    <Hydrate state={pageProps.dehydratedState}>
+                    <Hydrate>
                       <Component {...pageProps} />
                     </Hydrate>
                   </SnackbarProvider>
