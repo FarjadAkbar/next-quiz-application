@@ -1,5 +1,6 @@
-import { getApp, initializeApp } from "firebase/app";
-import { getFirestore } from "@firebase/firestore";
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
+import 'firebase/compat/firestore';
 
 import {
   NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -10,7 +11,7 @@ import {
 
 
 export const initFirebase = async (): Promise<void> => {
-  await initializeApp({
+  await firebase.initializeApp({
     projectId: NEXT_PUBLIC_FIREBASE_PROJECT_ID,
     messagingSenderId: NEXT_PUBLIC_FIREBASE_MESSAGING_ID,
     apiKey: NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -20,7 +21,7 @@ export const initFirebase = async (): Promise<void> => {
 
 
 // Initialize Firebase
-export const app = initializeApp({
+export const app = firebase.initializeApp({
   projectId: NEXT_PUBLIC_FIREBASE_PROJECT_ID,
   messagingSenderId: NEXT_PUBLIC_FIREBASE_MESSAGING_ID,
   apiKey: NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -29,4 +30,4 @@ export const app = initializeApp({
 
 
 // Initialize Cloud Firestore and get a reference to the service
-export const database = getFirestore(app);
+export const database = app.firestore();
