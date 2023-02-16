@@ -8,20 +8,20 @@ import {
   Grid,
   Button,
 } from "@mui/material";
+import Questions from "components/Questions";
 import { useRouter } from "next/router";
+import { useQuizQuestion } from "providers/Questions";
 import { useResultDetail } from "providers/Results";
-import {
-  ReactElement,
-  JSXElementConstructor,
-  ReactFragment,
-  ReactPortal,
-} from "react";
+import { quizSet } from "screens/HomeScreen/data";
+import { ButtonWrapper } from "theme/Button";
 import FormattedMessage from "theme/FormattedMessage";
 
 import messages from "./messages";
+import { TypographyWrapper } from "./Styled";
 
 const ResultScreen: React.FC = () => {
   const router = useRouter();
+  const questionSet = useQuizQuestion();
   const quizResult = useResultDetail({
     id: router?.query?.id?.toString(),
   });
@@ -35,90 +35,98 @@ const ResultScreen: React.FC = () => {
       <Paper
         sx={{
           margin: (theme) => theme.spacing(2),
-          padding: (theme) => theme.spacing(2),
+          padding: (theme) => theme.spacing(5),
         }}
       >
-        <Typography variant="h5">
+        <Typography variant="h4" sx={{ textAlign: "center" }}>
           <FormattedMessage {...messages.pageTitle} />
         </Typography>
+        <hr />
         <Box p={3}>
-          <Card>
-            <CardContent>
-              <Grid container>
-                {/* Name */}
-                <Grid item xs={3}>
-                  <Typography variant="h6" component="p">
-                    <FormattedMessage {...messages.name} />
-                  </Typography>
-                </Grid>
-                <Grid item xs={9}>
-                  <Typography variant="h6" component="p">
-                    {quizResult.data?.data.name}
-                  </Typography>
-                </Grid>
+          <Grid container>
+            {/* Name */}
+            <Grid item xs={6}>
+              <TypographyWrapper sx={{ textAlign: "right" }}>
+                <FormattedMessage {...messages.name} />
+              </TypographyWrapper>
+            </Grid>
+            <Grid item xs={6}>
+              <TypographyWrapper>
+                {quizResult.data?.data.name}
+              </TypographyWrapper>
+            </Grid>
 
-                {/* Email */}
-                <Grid item xs={3}>
-                  <Typography variant="h6" component="p">
-                    <FormattedMessage {...messages.email} />
-                  </Typography>
-                </Grid>
-                <Grid item xs={9}>
-                  <Typography variant="h6" component="p">
-                    {quizResult.data?.data.email}
-                  </Typography>
-                </Grid>
+            {/* Email */}
+            <Grid item xs={6}>
+              <TypographyWrapper sx={{ textAlign: "right", fontWeight: 500 }}>
+                <FormattedMessage {...messages.email} />
+              </TypographyWrapper>
+            </Grid>
+            <Grid item xs={6}>
+              <TypographyWrapper>
+                {quizResult.data?.data.email}
+              </TypographyWrapper>
+            </Grid>
 
-                {/* Total Question */}
-                <Grid item xs={3}>
-                  <Typography variant="h6" component="p">
-                    <FormattedMessage {...messages.question} />
-                  </Typography>
-                </Grid>
-                <Grid item xs={9}>
-                  <Typography variant="h6" component="p">
-                    {quizResult.data?.data.total_ques}
-                  </Typography>
-                </Grid>
+            {/* Total Question */}
+            <Grid item xs={6}>
+              <TypographyWrapper sx={{ textAlign: "right", fontWeight: 500 }}>
+                <FormattedMessage {...messages.question} />
+              </TypographyWrapper>
+            </Grid>
+            <Grid item xs={6}>
+              <TypographyWrapper>
+                {quizResult.data?.data.total_ques}
+              </TypographyWrapper>
+            </Grid>
 
-                {/* Score */}
-                <Grid item xs={3}>
-                  <Typography variant="h6" component="p">
-                    <FormattedMessage {...messages.score} />
-                  </Typography>
-                </Grid>
-                <Grid item xs={9}>
-                  <Typography variant="h6" component="p">
-                    {quizResult.data?.data.score}
-                  </Typography>
-                </Grid>
-              </Grid>
-
-              <Grid container>
-                <Grid item xs={3}>
-                  <Typography variant="h6" component="p">
-                    <FormattedMessage {...messages.yourAns} />
-                  </Typography>
-                </Grid>
-                <Grid item xs={9}>
-                  <Typography variant="h6" component="p">
-                    <FormattedMessage {...messages.correctAns} />
-                  </Typography>
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
+            {/* Score */}
+            <Grid item xs={6}>
+              <TypographyWrapper sx={{ textAlign: "right", fontWeight: 500 }}>
+                <FormattedMessage {...messages.score} />
+              </TypographyWrapper>
+            </Grid>
+            <Grid item xs={6}>
+              <TypographyWrapper>
+                {quizResult.data?.data.score}
+              </TypographyWrapper>
+            </Grid>
+          </Grid>
+        </Box>
+        <Box py={3}>
+          {questionSet.data?.map(
+            (
+              quiz: {
+                ans: string | number | boolean | undefined;
+                que: string;
+                queNo: string;
+                options: string[];
+              },
+              index: string | number,
+            ) => (
+              <Questions
+                question={quiz.que}
+                name={quiz.queNo}
+                value={quizResult.data?.data.submission[quiz.queNo]}
+                options={quiz.options}
+                disabled={true}
+                ans={quiz.ans}
+                label={<FormattedMessage {...messages.correctAns} />}
+                key={quiz.queNo}
+              />
+            ),
+          )}
         </Box>
 
         <Box py={3}>
-          <Button
+          <ButtonWrapper
             type="submit"
             variant="contained"
-            color="primary"
+            color="secondary"
             onClick={handleClick}
           >
-            <FormattedMessage {...messages.backButton} />
-          </Button>
+            <FormattedMessage {...messages.restartButton} />
+          </ButtonWrapper>
         </Box>
       </Paper>
     </Container>

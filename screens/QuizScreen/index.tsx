@@ -1,27 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { Formik, Form, ErrorMessage, useFormik } from "formik";
-import {
-  Button,
-  TextField,
-  RadioGroup,
-  FormControl,
-  FormControlLabel,
-  FormLabel,
-  Radio,
-  Paper,
-  Typography,
-} from "@mui/material";
-import * as Yup from "yup";
-
+import { useFormik } from "formik";
+import { Grid, Paper, Typography, Link } from "@mui/material";
 import { Box, Container } from "@mui/system";
 
-import { app, database } from "platform/initFirebase";
-import { useSnackbar } from "notistack";
 import { useRouter } from "next/router";
-import { FormattedMessage } from "react-intl";
-import messages from "./messages";
+import { useSnackbar } from "notistack";
+
 import { useCreateResult } from "providers/Results";
 import { useQuizQuestion } from "providers/Questions";
+import FormattedMessage from "theme/FormattedMessage";
+
+import Questions from "components/Questions";
+import messages from "./messages";
+import { ButtonWrapper } from "theme/Button";
 
 interface QuizValues {
   [key: string]: any;
@@ -30,9 +21,10 @@ interface QuizValues {
 const QuizScreen: React.FC = () => {
   const questionSet = useQuizQuestion();
 
+  let [step, setStep] = useState<number>(0);
   let [score, setScore] = useState<number>(0);
-  const [submission, setSubmission] = useState<string[]>([]);
-  const [correctAns, setCorrectAns] = useState<string[]>([]);
+  const [nextDisabled, setNextDisabled] = useState<boolean>(true);
+  const [backDisabled, setBackDisabled] = useState<boolean>(true);
 
   const initialValues: QuizValues = {};
 
@@ -49,6 +41,31 @@ const QuizScreen: React.FC = () => {
     }
   }, [createResult.isSuccess]);
 
+  const handleNext = (e: React.FormEvent<EventTarget>) => {
+    e.preventDefault();
+    setStep(++step);
+    if (questionSet.data && !values[questionSet.data[step].queNo]) {
+      setNextDisabled(true);
+    }
+
+    if (step > 0) {
+      setBackDisabled(false);
+    }
+  };
+
+  const handleBack = (e: React.FormEvent<EventTarget>) => {
+    e.preventDefault();
+    setStep(--step);
+
+    if (questionSet.data && values[questionSet.data[step].queNo]) {
+      setNextDisabled(false);
+    }
+
+    if (step <= 0) {
+      setBackDisabled(true);
+    }
+  };
+
   const { handleChange, handleSubmit, values, isSubmitting } = useFormik({
     initialValues,
     onSubmit: (values, { setSubmitting, resetForm }) => {
@@ -57,8 +74,6 @@ const QuizScreen: React.FC = () => {
           if (values[quiz.queNo] == quiz.ans) {
             setScore(++score);
           }
-          setSubmission((current) => [...current, values[quiz.queNo]]);
-          setCorrectAns((current) => [...current, quiz.ans]);
         },
       );
 
@@ -67,8 +82,7 @@ const QuizScreen: React.FC = () => {
         email: "ew@gmail.com",
         total_ques: questionSet.data?.length,
         score: score,
-        submission: submission,
-        correctAns: correctAns,
+        submission: values,
       });
       setSubmitting(true);
       resetForm();
@@ -83,50 +97,68 @@ const QuizScreen: React.FC = () => {
           padding: (theme) => theme.spacing(2),
         }}
       >
-        <Typography variant="h5">
-          <FormattedMessage {...messages.pageTitle} />
-        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginBottom: (theme) => theme.spacing(2),
+          }}
+        >
+          <Typography variant="h5">
+            <FormattedMessage {...messages.pageTitle} /> {step + 1} /{" "}
+            {questionSet.data?.length}
+          </Typography>
+          {/* <Link href="/add-quiz" underline="none">
+            <ButtonWrapper color="primary" variant="contained">
+              <FormattedMessage {...messages.addButton} />
+            </ButtonWrapper>
+          </Link> */}
+        </Box>
 
         {!questionSet.isLoading && (
           <Box component="form" onSubmit={handleSubmit}>
-            {questionSet.data?.map((quiz: any) => (
-              <Box py={3} sx={{ borderBottom: "1px solid" }} key={quiz.queNo}>
-                <Typography variant="subtitle2">{quiz.que}</Typography>
-                <FormControl>
-                  <RadioGroup
-                    aria-labelledby="demo-radio-buttons-group-label"
-                    name={quiz.queNo}
-                    onChange={handleChange}
-                  >
-                    {quiz.options?.map((option: any) => (
-                      <FormControlLabel
-                        value={option}
-                        key={option}
-                        control={
-                          <Radio
-                            sx={{
-                              "&, &.Mui-checked": {
-                                color: "#ccc",
-                              },
-                            }}
-                          />
-                        }
-                        label={option}
-                      />
-                    ))}
-                  </RadioGroup>
-                </FormControl>
-              </Box>
-            ))}
+            {questionSet && questionSet.data && (
+              <Questions
+                question={questionSet.data[step].que}
+                name={questionSet.data[step].queNo}
+                value={values[questionSet.data[step].queNo]}
+                changeHandler={(e) => {
+                  handleChange(e);
+                  setNextDisabled(false);
+                }}
+                options={questionSet.data[step].options}
+              />
+            )}
+
             <Box py={3}>
-              <Button
-                type="submit"
+              <ButtonWrapper
                 variant="contained"
-                color="primary"
-                disabled={isSubmitting}
+                color="secondary"
+                disabled={backDisabled}
+                onClick={handleBack}
               >
-                <FormattedMessage {...messages.submitButton} />
-              </Button>
+                <FormattedMessage {...messages.backButton} />
+              </ButtonWrapper>
+
+              {questionSet.data?.length === step + 1 ? (
+                <ButtonWrapper
+                  type="submit"
+                  variant="contained"
+                  color="success"
+                  disabled={nextDisabled}
+                >
+                  <FormattedMessage {...messages.submitButton} />
+                </ButtonWrapper>
+              ) : (
+                <ButtonWrapper
+                  variant="contained"
+                  color="primary"
+                  disabled={nextDisabled}
+                  onClick={handleNext}
+                >
+                  <FormattedMessage {...messages.nextButton} />
+                </ButtonWrapper>
+              )}
             </Box>
           </Box>
         )}

@@ -13,9 +13,9 @@ export default defineMessages({
     id: `${scope}.pageTitle`,
     defaultMessage: "Your Result Quiz App",
   },
-  backButton: {
-    id: `${scope}.backButton`,
-    defaultMessage: "Back",
+  restartButton: {
+    id: `${scope}.restartButton`,
+    defaultMessage: "Restart",
   },
   name: {
     id: `${scope}.name`,
@@ -44,6 +44,6 @@ export default defineMessages({
   },
   correctAns: {
     id: `${scope}.correctAns`,
-    defaultMessage: "Correct Answers",
+    defaultMessage: "Correct Answer:",
   },
 });

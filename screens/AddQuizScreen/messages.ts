@@ -11,7 +11,7 @@ export const scope = "app.screens.QuizScreen";
 export default defineMessages({
   pageTitle: {
     id: `${scope}.pageTitle`,
-    defaultMessage: "Quiz App",
+    defaultMessage: "Add Quiz",
   },
   submitButton: {
     id: `${scope}.submitButton`,
@@ -21,16 +21,27 @@ export default defineMessages({
     id: `${scope}.successMessage`,
     defaultMessage: "Quiz Submit Successfully",
   },
-  nextButton: {
-    id: `${scope}.nextButton`,
-    defaultMessage: "Next Button",
+
+  textPlaceholder: {
+    id: `${scope}.textPlaceholder`,
+    defaultMessage: "Write Question",
   },
-  backButton: {
-    id: `${scope}.backButton`,
-    defaultMessage: "Back Button",
+  questionLabel: {
+    id: `${scope}.questionLabel`,
+    defaultMessage: "Question",
   },
-  addButton: {
-    id: `${scope}.addButton`,
-    defaultMessage: "Add Quiz",
+  optionLabel: {
+    id: `${scope}.optionLabel`,
+    defaultMessage: "Option",
+  },
+  optionPlaceholder: {
+    id: `${scope}.optionPlaceholder`,
+    defaultMessage: "Option",
+  },
+
+  
+  ansLabel: {
+    id: `${scope}.ansLabel`,
+    defaultMessage: "Answer",
   },
 });

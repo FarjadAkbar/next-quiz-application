@@ -5,8 +5,9 @@ export namespace Result {
     email: string;
     score: number;
     total_ques: number;
-    submission: string[];
-    correctAns: string[];
+    submission: {
+      [key:string]: string | number | boolean
+    };
   };
 
   // Fetch
@@ -35,8 +36,9 @@ export namespace Result {
     email: string;
     score: number;
     total_ques: number;
-    submission: string[];
-    correctAns: string[];
+    submission: {
+      [key:string]: string | number | boolean
+    };
   };
   export interface CreateAPIPayload extends CreateProps {
     data: CreateMutationPayload;

@@ -1,7 +1,9 @@
-import { Typography, TypographyProps } from "@mui/material";
 import CardHeader, { CardHeaderProps } from "@mui/material/CardHeader";
 import InputLabel, { InputLabelProps } from "@mui/material/InputLabel";
 import { styled } from "@mui/material/styles";
+
+
+
 
 export const CardHeaderWrapper = styled(CardHeader)<CardHeaderProps>(
   ({ theme }) =>
@@ -12,18 +14,12 @@ export const CardHeaderWrapper = styled(CardHeader)<CardHeaderProps>(
     } as any),
 ) as (props: CardHeaderProps) => JSX.Element;
 
+
+
 export const InputLabelWrapper = styled(InputLabel)<InputLabelProps>(
   ({ theme }) =>
     ({
-      marginBottom: theme.spacing(1),
+      color: theme.palette.primary.dark,
+      marginBottom:  theme.spacing(1),
     } as any),
 ) as (props: InputLabelProps) => JSX.Element;
-
-export const TypographyWrapper = styled(Typography)<TypographyProps>(
-  ({ theme }) =>
-    ({
-      padding: theme.spacing(1),
-      fontSize: 20,
-      textTransform: "capitalize",
-    } as any),
-) as (props: TypographyProps) => JSX.Element;
