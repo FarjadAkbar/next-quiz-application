@@ -1,7 +1,6 @@
-import { app, database } from "platform/initFirebase";
-import { collection, getDocs } from "firebase/firestore";
+import { database } from "platform/initFirebase";
 import { Questions } from "./types";
-import { useState } from "react";
+
 
 const dbInstance = database.collection("quiz-set");
 
@@ -13,4 +12,14 @@ export async function fetch(
   const data  = docs.map((item) => item.data())
 
   return data;
+}
+
+
+// Create
+export async function create(props: Questions.CreateAPIPayload): Promise<any> {
+  const { id } = await dbInstance.add({
+    ...props.data,
+    created: new Date().toISOString(),
+  });
+  return id;
 }

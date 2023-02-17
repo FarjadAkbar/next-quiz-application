@@ -108,11 +108,11 @@ const QuizScreen: React.FC = () => {
             <FormattedMessage {...messages.pageTitle} /> {step + 1} /{" "}
             {questionSet.data?.length}
           </Typography>
-          {/* <Link href="/add-quiz" underline="none">
+          <Link href="/add-quiz" underline="none">
             <ButtonWrapper color="primary" variant="contained">
               <FormattedMessage {...messages.addButton} />
             </ButtonWrapper>
-          </Link> */}
+          </Link>
         </Box>
 
         {!questionSet.isLoading && (

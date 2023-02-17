@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Container, Grid, Paper, Typography } from "@mui/material";
+import { Box, Container, Grid, Link, Paper, Typography } from "@mui/material";
 import { useFormik } from "formik";
 import { useSnackbar } from "notistack";
 import * as Yup from "yup";
@@ -9,28 +9,57 @@ import FormattedMessage from "theme/FormattedMessage";
 import { Form } from "./form";
 import messages from "./messages";
 import { CardHeaderWrapper, InputLabelWrapper } from "./Styled";
+import { useRouter } from "next/router";
+import { useCreateQuiz } from "providers/Questions";
 
 const AddQuizScreen: React.FC = () => {
-  // const validationSchema = Yup.object().shape({
-  //   que: Yup.string().required().label("question"),
-  //   options: Yup.string().required().label("option"),
-  //   ans: Yup.string().required().label("answer"),
-  // });
+  const validationSchema = Yup.object().shape({
+    que: Yup.string().required().label("question"),
+    options: Yup.array().required().label("option"),
+    ans: Yup.string().required().label("answer"),
+  });
+
+  const { enqueueSnackbar } = useSnackbar();
+  const createQuiz = useCreateQuiz();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (createQuiz.isSuccess) {
+      enqueueSnackbar(<FormattedMessage {...messages.successMessage} />, {
+        variant: "success",
+      });
+      router.push(`/`);
+    }
+  }, [createQuiz.isSuccess]);
 
   // use formik
-  const { handleChange, handleSubmit, handleBlur, setFieldValue, errors, values, touched } = useFormik({
+  const {
+    handleChange,
+    handleSubmit,
+    handleBlur,
+    setFieldValue,
+    errors,
+    values,
+    touched,
+  } = useFormik({
     initialValues: {
       que: "",
-      options: [],
-      ans: ""
+      options: [""],
+      ans: "",
     },
-    // validationSchema,
+    validationSchema,
     onSubmit: (values, { resetForm }) => {
+      createQuiz.mutate({
+        que: values.que,
+        queNo: `que_${Math.floor(Math.random() * 1000)}`,
+        options: values.options.filter(option => !!option),
+        ans: values.ans,
+      });
+
       resetForm();
     },
   });
 
-  console.log(values)
 
   return (
     <Container>
@@ -54,9 +83,11 @@ const AddQuizScreen: React.FC = () => {
               <FormattedMessage {...messages.pageTitle} />
             </Typography>
             <Box sx={{ m: 1 }}>
-              <ButtonWrapper color="primary" variant="contained">
-                <FormattedMessage {...messages.submitButton} />
-              </ButtonWrapper>
+              <Link href="/" underline="none">
+                <ButtonWrapper variant="contained" sx={{color: (theme) => theme.palette.primary.light, background: (theme) => theme.palette.primary.dark}}>
+                  <FormattedMessage {...messages.backButton} />
+                </ButtonWrapper>
+              </Link>
             </Box>
           </Box>
 
@@ -70,6 +101,13 @@ const AddQuizScreen: React.FC = () => {
                 touched={touched}
                 setFieldValue={setFieldValue}
               />
+            </Grid>
+            <Grid item>
+            <Box sx={{ m: 1 }}>
+              <ButtonWrapper type="submit" color="primary" variant="contained">
+                <FormattedMessage {...messages.submitButton} />
+              </ButtonWrapper>
+            </Box>
             </Grid>
           </Grid>
         </Box>

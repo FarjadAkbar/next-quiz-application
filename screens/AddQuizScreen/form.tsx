@@ -36,7 +36,7 @@ export const Form: React.FC<FormProps> = ({
   errors,
   handleBlur,
   handleChange,
-  setFieldValue,
+  setFieldValue
 }) => {
   const textPlaceholder = useFormattedMessage(messages.textPlaceholder);
   const optionPlaceholder = useFormattedMessage(messages.optionPlaceholder);
@@ -45,7 +45,7 @@ export const Form: React.FC<FormProps> = ({
 
   const generateInputField = (ingredientNum: number) => {
     return (
-      <Grid item xs={4}>
+      <Grid item xs={4} key={ingredientNum}>
         <InputLabelWrapper htmlFor="quiz-option">
           <FormattedMessage {...messages.optionLabel} />
         </InputLabelWrapper>
@@ -55,8 +55,11 @@ export const Form: React.FC<FormProps> = ({
           value={values.options[ingredientNum]}
           placeholder={optionPlaceholder}
           fullWidth
-          onBlur={handleBlur}
-          onChange={handleChange}
+          onChange={(e) => {
+            if (setFieldValue) {
+              setFieldValue(`options[${ingredientNum}]`, e.target.value);
+            }
+          }}
           error={Boolean(touched.options && errors.options)}
         />
         {touched.options && errors.options && (
@@ -107,9 +110,9 @@ export const Form: React.FC<FormProps> = ({
       <Grid item xs={12}>
         {numberOfFields < 10 && (
           <ButtonWrapper
-            variant="contained"
-            color="primary"
+            variant="contained" 
             onClick={handleAddField}
+            sx={{color: (theme) => theme.palette.primary.light, background: (theme) => theme.palette.primary.dark}}
           >
             <Add />
           </ButtonWrapper>
@@ -119,9 +122,6 @@ export const Form: React.FC<FormProps> = ({
       <Grid item xs={12}>
         <InputLabelWrapper htmlFor="quiz-ans">
           <FormattedMessage {...messages.ansLabel} />
-          {
-            values.options
-          }
         </InputLabelWrapper>
         <Select
           labelId="quiz-ans"

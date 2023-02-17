@@ -19,7 +19,7 @@ export default defineMessages({
   },
   successMessage: {
     id: `${scope}.successMessage`,
-    defaultMessage: "Quiz Submit Successfully",
+    defaultMessage: "Quiz Add Successfully",
   },
 
   textPlaceholder: {
@@ -43,5 +43,9 @@ export default defineMessages({
   ansLabel: {
     id: `${scope}.ansLabel`,
     defaultMessage: "Answer",
+  },
+  backButton: {
+    id: `${scope}.backButton`,
+    defaultMessage: "Back",
   },
 });
