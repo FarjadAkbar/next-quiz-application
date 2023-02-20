@@ -14,7 +14,7 @@ const KEY = "Questions";
 export function useQuizQuestion(
   props: Questions.FetchProps = {},
 ): UseQueryResult<Questions.FetchResponse> {
-  return useQuery("question", () => api.fetch(props), {});
+  return useQuery(KEY, () => api.fetch(props), {});
 }
 
 //Create
@@ -31,7 +31,7 @@ export function useCreateQuiz(
   return useMutation((payload) => api.create({ ...props, data: payload }), {
     mutationKey: `${KEY}|Create`,
     onSuccess: () => {
-      queryClient.invalidateQueries("create");
+      queryClient.invalidateQueries(KEY);
     },
     retry: 0,
   });

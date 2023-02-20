@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import Link from 'next/link'
+import Link from "next/link";
 import { useFormik } from "formik";
-import { Grid, Paper, Typography } from "@mui/material";
+import { Paper, Typography, CircularProgress } from "@mui/material";
 import { Box, Container } from "@mui/system";
 
 import { useRouter } from "next/router";
 import { useSnackbar } from "notistack";
+import * as Yup from "yup";
 
 import { useCreateResult } from "providers/Results";
 import { useQuizQuestion } from "providers/Questions";
@@ -14,6 +15,8 @@ import FormattedMessage from "theme/FormattedMessage";
 import Questions from "components/Questions";
 import messages from "./messages";
 import { ButtonWrapper } from "theme/Button";
+import { useQuizCategory } from "providers/Categories";
+import QuizIntro from "./intro";
 
 interface QuizValues {
   [key: string]: any;
@@ -21,13 +24,20 @@ interface QuizValues {
 
 const QuizScreen: React.FC = () => {
   const questionSet = useQuizQuestion();
+  const categorySet = useQuizCategory();
 
   let [step, setStep] = useState<number>(0);
   let [score, setScore] = useState<number>(0);
   const [nextDisabled, setNextDisabled] = useState<boolean>(true);
   const [backDisabled, setBackDisabled] = useState<boolean>(true);
+  const [intro, setIntro] = useState<boolean>(true);
 
-  const initialValues: QuizValues = {};
+  const [questionData, setQuestionData] = useState<any>();
+
+  const initialValues: QuizValues = {
+    category: "all"
+  };
+
 
   const { enqueueSnackbar } = useSnackbar();
   const createResult = useCreateResult();
@@ -40,12 +50,13 @@ const QuizScreen: React.FC = () => {
       });
       router.push(`result/${createResult.data}`);
     }
-  }, [createResult.isSuccess]);
+    setQuestionData(questionSet.data);
+  }, [createResult.isSuccess, questionSet.isSuccess]);
 
   const handleNext = (e: React.FormEvent<EventTarget>) => {
     e.preventDefault();
     setStep(++step);
-    if (questionSet.data && !values[questionSet.data[step].queNo]) {
+    if (questionData && !values[questionData[step].queNo]) {
       setNextDisabled(true);
     }
 
@@ -58,7 +69,7 @@ const QuizScreen: React.FC = () => {
     e.preventDefault();
     setStep(--step);
 
-    if (questionSet.data && values[questionSet.data[step].queNo]) {
+    if (questionData && values[questionData[step].queNo]) {
       setNextDisabled(false);
     }
 
@@ -67,28 +78,55 @@ const QuizScreen: React.FC = () => {
     }
   };
 
-  const { handleChange, handleSubmit, values, isSubmitting } = useFormik({
+  const {
+    touched,
+    errors,
+    handleChange,
+    handleBlur,
+    handleSubmit,
+    values,
+    isSubmitting,
+    setFieldValue,
+  } = useFormik({
     initialValues,
     onSubmit: (values, { setSubmitting, resetForm }) => {
-      questionSet.data?.forEach(
-        (quiz: { queNo: string | number; ans: any }) => {
-          if (values[quiz.queNo] == quiz.ans) {
-            setScore(++score);
-          }
-        },
-      );
+      questionData?.forEach((quiz: { queNo: string | number; ans: any }) => {
+        if (values[quiz.queNo] == quiz.ans) {
+          setScore(++score);
+        }
+      });
+      
+      const submission = { ...values };
+      delete submission?.category;
 
       createResult.mutate({
         name: "abc",
         email: "ew@gmail.com",
-        total_ques: questionSet.data?.length,
+        category: values.category,
+        total_ques: questionData?.length,
         score: score,
-        submission: values,
+        submission: submission,
       });
       setSubmitting(true);
       resetForm();
     },
   });
+
+  if (!questionSet.isFetched || createResult.isLoading) {
+    return (
+      <CircularProgress
+        size={68}
+        sx={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          marginTop: "-12px",
+          marginLeft: "-12px",
+        }}
+      />
+    );
+  }
+  // console.log(questionData, "data...........");
 
   return (
     <Container>
@@ -98,70 +136,92 @@ const QuizScreen: React.FC = () => {
           padding: (theme) => theme.spacing(2),
         }}
       >
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            marginBottom: (theme) => theme.spacing(2),
-          }}
-        >
-          <Typography variant="h5">
-            <FormattedMessage {...messages.pageTitle} /> {step + 1} /{" "}
-            {questionSet.data?.length}
-          </Typography>
-          <Link href="/add-quiz" style={{ textDecoration: 'inherit'}}>
-            <ButtonWrapper color="primary" variant="contained">
-              <FormattedMessage {...messages.addButton} />
-            </ButtonWrapper>
-          </Link>
-        </Box>
-
-        {!questionSet.isLoading && (
-          <Box component="form" onSubmit={handleSubmit}>
-            {questionSet && questionSet.data && (
-              <Questions
-                question={questionSet.data[step].que}
-                name={questionSet.data[step].queNo}
-                value={values[questionSet.data[step].queNo]}
-                changeHandler={(e) => {
-                  handleChange(e);
-                  setNextDisabled(false);
-                }}
-                options={questionSet.data[step].options}
-              />
-            )}
-
-            <Box py={3}>
-              <ButtonWrapper
-                variant="contained"
-                color="secondary"
-                disabled={backDisabled}
-                onClick={handleBack}
-              >
-                <FormattedMessage {...messages.backButton} />
-              </ButtonWrapper>
-
-              {questionSet.data?.length === step + 1 ? (
-                <ButtonWrapper
-                  type="submit"
-                  variant="contained"
-                  color="success"
-                  disabled={nextDisabled}
-                >
-                  <FormattedMessage {...messages.submitButton} />
-                </ButtonWrapper>
-              ) : (
-                <ButtonWrapper
-                  variant="contained"
-                  color="primary"
-                  disabled={nextDisabled}
-                  onClick={handleNext}
-                >
-                  <FormattedMessage {...messages.nextButton} />
-                </ButtonWrapper>
-              )}
-            </Box>
+        {intro ? (
+          <>
+          <QuizIntro
+            values={values}
+            setFieldValue={setFieldValue}
+            setQuestionData={setQuestionData}
+            categories={categorySet.data}
+            questionSet={questionSet.data}
+          />
+          <Box p={3}>
+          <ButtonWrapper
+            variant="contained"
+            color="primary"
+            onClick={() => { setIntro(false)}}
+          >
+            <FormattedMessage {...messages.startButton} />
+          </ButtonWrapper>
           </Box>
+          </>
+        ) : (
+          <>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: (theme) => theme.spacing(2),
+              }}
+            >
+              <Typography variant="h5">
+                <FormattedMessage {...messages.pageTitle} /> {step + 1} /{" "}
+                {questionData?.length}
+              </Typography>
+              <Link href="/add-quiz" style={{ textDecoration: "inherit" }}>
+                <ButtonWrapper color="primary" variant="contained">
+                  <FormattedMessage {...messages.addButton} />
+                </ButtonWrapper>
+              </Link>
+            </Box>
+            {!questionSet.isLoading && (
+              <Box component="form" onSubmit={handleSubmit}>
+                {questionSet && questionData && (
+                  <Questions
+                    question={questionData[step]?.que}
+                    name={questionData[step]?.queNo}
+                    value={values[questionData[step]?.queNo]}
+                    changeHandler={(e) => {
+                      handleChange(e);
+                      setNextDisabled(false);
+                    }}
+                    options={questionData[step]?.options}
+                  />
+                )}
+
+                <Box py={3}>
+                  <ButtonWrapper
+                    variant="contained"
+                    color="secondary"
+                    disabled={backDisabled}
+                    onClick={handleBack}
+                  >
+                    <FormattedMessage {...messages.backButton} />
+                  </ButtonWrapper>
+
+                  {questionData?.length === step + 1 ? (
+                    <ButtonWrapper
+                      type="submit"
+                      variant="contained"
+                      color="success"
+                      disabled={nextDisabled}
+                    >
+                      <FormattedMessage {...messages.submitButton} />
+                    </ButtonWrapper>
+                  ) : (
+                    <ButtonWrapper
+                      variant="contained"
+                      color="primary"
+                      disabled={nextDisabled}
+                      onClick={handleNext}
+                    >
+                      <FormattedMessage {...messages.nextButton} />
+                    </ButtonWrapper>
+                  )}
+                </Box>
+              </Box>
+            )}
+          </>
         )}
       </Paper>
     </Container>

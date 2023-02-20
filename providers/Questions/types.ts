@@ -7,7 +7,8 @@ export namespace Questions {
     queNo: number | string;
     options: string[];
     ans: string;
-  }
+    category: string;
+  };
 
   export type Quiz = {
     id: string;
@@ -21,20 +22,19 @@ export namespace Questions {
   };
   export interface FetchAPIPayload extends FetchProps {}
 
-    // Create
-    export type CreateProps = {};
-    export type CreateResponse = {
-      data: Item;
-    };
-    export type CreateMutationPayload = {
-      que: string;
-      queNo: number | string;
-      options: string[];
-      ans: string;
-    };
-    export interface CreateAPIPayload extends CreateProps {
-      data: CreateMutationPayload;
-    }
+  // Create
+  export type CreateProps = {};
+  export type CreateResponse = {
+    data: Item;
+  };
+  export type CreateMutationPayload = {
+    que: string;
+    queNo: number | string;
+    options: string[];
+    ans: string;
+    category: string;
+  };
+  export interface CreateAPIPayload extends CreateProps {
+    data: CreateMutationPayload;
+  }
 }
-
-

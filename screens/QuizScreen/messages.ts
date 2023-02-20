@@ -13,6 +13,10 @@ export default defineMessages({
     id: `${scope}.pageTitle`,
     defaultMessage: "Quiz App",
   },
+  pageTitleIntro: {
+    id: `${scope}.pageTitleIntro`,
+    defaultMessage: "Select Questions Category",
+  },
   submitButton: {
     id: `${scope}.submitButton`,
     defaultMessage: "Submit",
@@ -33,4 +37,34 @@ export default defineMessages({
     id: `${scope}.addButton`,
     defaultMessage: "Add Quiz",
   },
+
+  nameLabel:{
+    id: `${scope}.nameLabel`,
+    defaultMessage: "Name",
+  },
+  emailLabel:{
+    id: `${scope}.emailLabel`,
+    defaultMessage: "Email",
+  },
+  
+  categoryLabel:{
+    id: `${scope}.categoryLabel`,
+    defaultMessage: "Category",
+  },
+
+  namePlaceholder:{
+    id: `${scope}.namePlaceholder`,
+    defaultMessage: "Name",
+  },
+
+  emailPlaceholder:{
+    id: `${scope}.emailPlaceholder`,
+    defaultMessage: "Email",
+  },
+
+  startButton:{
+    id: `${scope}.startButton`,
+    defaultMessage: "Start Quiz",
+  }
+
 });

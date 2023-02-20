@@ -5,6 +5,7 @@ export namespace Result {
     email: string;
     score: number;
     total_ques: number;
+    category:string;
     submission: {
       [key:string]: string | number | boolean
     };
@@ -36,6 +37,7 @@ export namespace Result {
     email: string;
     score: number;
     total_ques: number;
+    category:string;
     submission: {
       [key:string]: string | number | boolean
     };

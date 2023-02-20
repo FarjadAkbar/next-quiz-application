@@ -25,6 +25,10 @@ export default defineMessages({
     id: `${scope}.email`,
     defaultMessage: "Email:",
   },
+  category: {
+    id: `${scope}.category`,
+    defaultMessage: "Category:",
+  },
   score: {
     id: `${scope}.score`,
     defaultMessage: "Score:",

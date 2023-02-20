@@ -12,6 +12,7 @@ import Questions from "components/Questions";
 import { useRouter } from "next/router";
 import { useQuizQuestion } from "providers/Questions";
 import { useResultDetail } from "providers/Results";
+import { useEffect, useState } from "react";
 import { quizSet } from "screens/HomeScreen/data";
 import { ButtonWrapper } from "theme/Button";
 import FormattedMessage from "theme/FormattedMessage";
@@ -29,6 +30,15 @@ const ResultScreen: React.FC = () => {
   const handleClick = () => {
     router.push(`/`);
   };
+
+  const [questionData, setQuestionData] = useState<any>();
+  useEffect(() => {
+    if(quizResult?.data?.data.category !== "all"){
+      setQuestionData(questionSet.data?.filter((q: any) => q.category == quizResult?.data?.data.category));
+    } else{
+      setQuestionData(questionSet.data);
+    }
+  }, [quizResult.isSuccess, questionSet.isSuccess]);
 
   return (
     <Container>
@@ -68,6 +78,18 @@ const ResultScreen: React.FC = () => {
               </TypographyWrapper>
             </Grid>
 
+            {/* Category */}
+            <Grid item xs={6}>
+              <TypographyWrapper sx={{ textAlign: "right", fontWeight: 500 }}>
+                <FormattedMessage {...messages.category} />
+              </TypographyWrapper>
+            </Grid>
+            <Grid item xs={6}>
+              <TypographyWrapper>
+                {quizResult.data?.data.category}
+              </TypographyWrapper>
+            </Grid>
+
             {/* Total Question */}
             <Grid item xs={6}>
               <TypographyWrapper sx={{ textAlign: "right", fontWeight: 500 }}>
@@ -94,7 +116,7 @@ const ResultScreen: React.FC = () => {
           </Grid>
         </Box>
         <Box py={3}>
-          {questionSet.data?.map(
+          {questionData?.map(
             (
               quiz: {
                 ans: string | number | boolean | undefined;

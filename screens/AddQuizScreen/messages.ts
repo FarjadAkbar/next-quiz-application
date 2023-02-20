@@ -39,7 +39,10 @@ export default defineMessages({
     defaultMessage: "Option",
   },
 
-  
+  categoryLabel: {
+    id: `${scope}.categoryLabel`,
+    defaultMessage: "Category",
+  },
   ansLabel: {
     id: `${scope}.ansLabel`,
     defaultMessage: "Answer",
