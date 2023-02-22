@@ -11,6 +11,7 @@ import * as Yup from "yup";
 import { useCreateResult } from "providers/Results";
 import { useQuizQuestion } from "providers/Questions";
 import FormattedMessage from "theme/FormattedMessage";
+import { validateEmail } from "utils";
 
 import Questions from "components/Questions";
 import messages from "./messages";
@@ -19,6 +20,9 @@ import { useQuizCategory } from "providers/Categories";
 import QuizIntro from "./intro";
 
 interface QuizValues {
+  name: string;
+  email: string;
+  category: string;
   [key: string]: any;
 }
 
@@ -35,9 +39,10 @@ const QuizScreen: React.FC = () => {
   const [questionData, setQuestionData] = useState<any>();
 
   const initialValues: QuizValues = {
-    category: "all"
+    name: "",
+    email: "",
+    category: "all",
   };
-
 
   const { enqueueSnackbar } = useSnackbar();
   const createResult = useCreateResult();
@@ -82,7 +87,6 @@ const QuizScreen: React.FC = () => {
     touched,
     errors,
     handleChange,
-    handleBlur,
     handleSubmit,
     values,
     isSubmitting,
@@ -95,22 +99,23 @@ const QuizScreen: React.FC = () => {
           setScore(++score);
         }
       });
-      
-      const submission = { ...values };
-      delete submission?.category;
 
       createResult.mutate({
-        name: "abc",
-        email: "ew@gmail.com",
+        name: values.name,
+        email: values.email,
         category: values.category,
         total_ques: questionData?.length,
         score: score,
-        submission: submission,
+        submission: values.submission,
       });
       setSubmitting(true);
       resetForm();
     },
   });
+
+  const isFormValid = () => {
+    return values.name && values.email && validateEmail(values.email);
+  };
 
   if (!questionSet.isFetched || createResult.isLoading) {
     return (
@@ -136,93 +141,100 @@ const QuizScreen: React.FC = () => {
           padding: (theme) => theme.spacing(2),
         }}
       >
-        {intro ? (
-          <>
-          <QuizIntro
-            values={values}
-            setFieldValue={setFieldValue}
-            setQuestionData={setQuestionData}
-            categories={categorySet.data}
-            questionSet={questionSet.data}
-          />
-          <Box p={3}>
-          <ButtonWrapper
-            variant="contained"
-            color="primary"
-            onClick={() => { setIntro(false)}}
-          >
-            <FormattedMessage {...messages.startButton} />
-          </ButtonWrapper>
-          </Box>
-          </>
-        ) : (
-          <>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: (theme) => theme.spacing(2),
-              }}
-            >
-              <Typography variant="h5">
-                <FormattedMessage {...messages.pageTitle} /> {step + 1} /{" "}
-                {questionData?.length}
-              </Typography>
-              <Link href="/add-quiz" style={{ textDecoration: "inherit" }}>
-                <ButtonWrapper color="primary" variant="contained">
-                  <FormattedMessage {...messages.addButton} />
+        <Box component="form" onSubmit={handleSubmit}>
+          {intro ? (
+            <>
+              <QuizIntro
+                values={values}
+                touched={touched}
+                errors={errors}
+                handleChange={handleChange}
+                setFieldValue={setFieldValue}
+                setQuestionData={setQuestionData}
+                categories={categorySet.data}
+                questionSet={questionSet.data}
+              />
+              <Box p={3}>
+                <ButtonWrapper
+                  variant="contained"
+                  color="primary"
+                  disabled={!isFormValid()}
+                  onClick={() => {
+                    setIntro(false);
+                  }}
+                >
+                  <FormattedMessage {...messages.startButton} />
                 </ButtonWrapper>
-              </Link>
-            </Box>
-            {!questionSet.isLoading && (
-              <Box component="form" onSubmit={handleSubmit}>
-                {questionSet && questionData && (
-                  <Questions
-                    question={questionData[step]?.que}
-                    name={questionData[step]?.queNo}
-                    value={values[questionData[step]?.queNo]}
-                    changeHandler={(e) => {
-                      handleChange(e);
-                      setNextDisabled(false);
-                    }}
-                    options={questionData[step]?.options}
-                  />
-                )}
-
-                <Box py={3}>
-                  <ButtonWrapper
-                    variant="contained"
-                    color="secondary"
-                    disabled={backDisabled}
-                    onClick={handleBack}
-                  >
-                    <FormattedMessage {...messages.backButton} />
-                  </ButtonWrapper>
-
-                  {questionData?.length === step + 1 ? (
-                    <ButtonWrapper
-                      type="submit"
-                      variant="contained"
-                      color="success"
-                      disabled={nextDisabled}
-                    >
-                      <FormattedMessage {...messages.submitButton} />
-                    </ButtonWrapper>
-                  ) : (
-                    <ButtonWrapper
-                      variant="contained"
-                      color="primary"
-                      disabled={nextDisabled}
-                      onClick={handleNext}
-                    >
-                      <FormattedMessage {...messages.nextButton} />
-                    </ButtonWrapper>
-                  )}
-                </Box>
               </Box>
-            )}
-          </>
-        )}
+            </>
+          ) : (
+            <>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  paddingBottom: (theme) => theme.spacing(2),
+                }}
+              >
+                <Typography variant="h5">
+                  <FormattedMessage {...messages.pageTitle} /> {step + 1} /{" "}
+                  {questionData?.length}
+                </Typography>
+              </Box>
+              {!questionSet.isLoading && (
+                <Box>
+                  {questionSet && questionData && (
+                    <Questions
+                      question={questionData[step]?.que}
+                      name={`submission[${questionData[step]?.queNo}]`}
+                      value={
+                        values.submission &&
+                        values.submission[questionData[step]?.queNo]
+                      }
+                      changeHandler={(e) => {
+                        handleChange(e);
+                        setNextDisabled(false);
+                      }}
+                      options={questionData[step]?.options}
+                    />
+                  )}
+
+                  <Box py={3}>
+                    <ButtonWrapper
+                      variant="contained"
+                      color="secondary"
+                      disabled={backDisabled}
+                      onClick={handleBack}
+                    >
+                      <FormattedMessage {...messages.backButton} />
+                    </ButtonWrapper>
+
+                    {questionData?.length === step + 1 ? (
+                      <ButtonWrapper
+                        type="submit"
+                        variant="contained"
+                        color="success"
+                        disabled={nextDisabled}
+                      >
+                        <FormattedMessage {...messages.submitButton} />
+                      </ButtonWrapper>
+                    ) : (
+                      <ButtonWrapper
+                        variant="contained"
+                        color="primary"
+                        disabled={nextDisabled}
+                        onClick={handleNext}
+                      >
+                        <FormattedMessage {...messages.nextButton} />
+                      </ButtonWrapper>
+                    )}
+                  </Box>
+                </Box>
+              )}
+            </>
+          )}
+        </Box>
       </Paper>
     </Container>
   );

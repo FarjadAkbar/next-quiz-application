@@ -15,7 +15,7 @@ export default defineMessages({
   },
   pageTitleIntro: {
     id: `${scope}.pageTitleIntro`,
-    defaultMessage: "Select Questions Category",
+    defaultMessage: "Start Quiz",
   },
   submitButton: {
     id: `${scope}.submitButton`,
@@ -65,6 +65,11 @@ export default defineMessages({
   startButton:{
     id: `${scope}.startButton`,
     defaultMessage: "Start Quiz",
+  },
+
+  allLabel: {
+    id: `${scope}.allLabel`,
+    defaultMessage: "All",
   }
 
 });
